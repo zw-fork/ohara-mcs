@@ -1,0 +1,26 @@
+ohara-mcs:
+  local-mode: true
+  namespace: default
+  rpc-type: grpc
+  grpc-config:
+    keep-alive-time: 3000
+    keep-alive-timeout: 3000
+    permit-keep-alive-time: 3000
+    max-inbound-message-size: 10240
+  raft-config:
+     election-timeout: 1000 # 选举超时时间，默认1000
+     read-only-option: read_only_lease_based # 读写模式，默认read_only_safe
+     port-offset: 1001
+  cluster-address:
+#    - 192.168.31.43:9001 # 默认9001
+#    - 192.168.31.43:9101
+    - 127.0.0.1:9001 # 默认9001
+    - 127.0.0.1:9101
+    - 127.0.0.1:9201
+    - 127.0.0.1:9301
+  port: 8300 # 默认8000
+
+# HTTP 端口
+server:
+  port: 7400
+

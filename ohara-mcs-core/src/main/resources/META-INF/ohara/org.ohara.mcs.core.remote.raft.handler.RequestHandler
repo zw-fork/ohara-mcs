@@ -1,0 +1,3 @@
+read=org.ohara.mcs.core.remote.raft.handler.ReadRequestHandler
+write=org.ohara.mcs.core.remote.raft.handler.WriteRequestHandler
+delete=org.ohara.mcs.core.remote.raft.handler.DeleteRequestHandler

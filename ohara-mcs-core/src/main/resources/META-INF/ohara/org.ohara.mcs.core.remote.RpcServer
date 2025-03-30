@@ -1,0 +1,2 @@
+grpc=org.ohara.mcs.core.remote.grpc.GrpcServer
+raft=org.ohara.mcs.core.remote.raft.RaftServer

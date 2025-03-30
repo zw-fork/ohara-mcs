@@ -1,0 +1,13 @@
+ohara-mcs:
+  rpc-type: grpc
+  cluster-address:
+    - 127.0.0.1:8000 # 默认9001
+    - 127.0.0.1:8100
+    - 127.0.0.1:8200
+    - 127.0.0.1:8300
+  namespace: default
+
+# HTTP 端口
+server:
+  port: 9527
+
