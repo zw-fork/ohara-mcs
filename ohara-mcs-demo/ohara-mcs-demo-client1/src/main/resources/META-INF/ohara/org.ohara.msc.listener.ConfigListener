@@ -1,1 +1,1 @@
-test=org.ohara.mcs.config.TestServerAddressConfigListener
+user=org.ohara.mcs.listener.UserConfigListener

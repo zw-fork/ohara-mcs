@@ -8,12 +8,11 @@ ohara-mcs:
     permit-keep-alive-time: 3000
     max-inbound-message-size: 10240
   raft-config:
-     election-timeout: 1000 # 选举超时时间，默认1000
-     read-only-option: read_only_lease_based # 读写模式，默认read_only_safe
-     port-offset: 1001
+    election-timeout: 1000 # 选举超时时间，默认1000
+    read-only-option: read_only_lease_based # 读写模式，默认read_only_safe
+    port-offset: 1001
+    single-node: false
   cluster-address:
-#    - 127.91.2.26:9001 # 默认9001
-#    - 127.91.2.26:9101
     - 127.0.0.1:9001 # 默认9001
     - 127.0.0.1:9101
     - 127.0.0.1:9201

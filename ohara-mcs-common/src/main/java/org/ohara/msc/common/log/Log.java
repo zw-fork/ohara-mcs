@@ -41,10 +41,12 @@ public class Log {
     private static final String DEFAULT_TEMPLATE = "|{}#{}|";
 
     public static void print(String msg) {
+//        debug(msg);
         System.out.println(msg);
     }
 
     public static void print(String msgTemplate, Object... msgParams) {
+//        debug(msgTemplate, msgParams);
         System.out.printf((msgTemplate) + "%n", msgParams);
     }
 

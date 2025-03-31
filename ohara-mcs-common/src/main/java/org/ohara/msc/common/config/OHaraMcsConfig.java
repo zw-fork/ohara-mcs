@@ -63,6 +63,9 @@ public class OHaraMcsConfig implements Serializable {
     @Data
     public static class RaftConfig {
 
+        /**
+         * 是否为单节点模式
+         */
         boolean isSingleNode = false;
 
         private int refreshJitterMin = 0;

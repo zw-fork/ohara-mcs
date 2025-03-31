@@ -37,7 +37,7 @@ public class RaftNodeMonitor {
 
     public void start() {
         scheduler.scheduleAtFixedRate(this::checkClusterHealth, checkInterval / 2, checkInterval, TimeUnit.MILLISECONDS);
-        Log.print("[Node监控器] 已启动 (检查间隔={}ms, 最大静默时间={}ms)", checkInterval, maxSilentMs);
+        Log.print("[Node监控器] 已启动 (检查间隔={%s}ms, 最大静默时间={%s}ms)", checkInterval, maxSilentMs);
     }
 
     private void checkClusterHealth() {

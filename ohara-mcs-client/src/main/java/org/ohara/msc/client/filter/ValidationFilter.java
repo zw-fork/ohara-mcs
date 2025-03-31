@@ -55,9 +55,9 @@ public class ValidationFilter<OPTION extends RequestOption> extends AbstractFilt
         if (request.getDataId() == null) {
             throw new IllegalArgumentException("request dataId is null");
         }
-        if (request.getConfigData() == null) {
-            throw new IllegalArgumentException("request configData is null");
-        }
+//        if (request.getConfigData() == null) {
+//            throw new IllegalArgumentException("request configData is null");
+//        }
         if (request.getGmtCreate() == null) {
             request.setGmtCreate(System.currentTimeMillis());
         }
