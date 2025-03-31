@@ -312,10 +312,6 @@ public class RaftServer extends AbstractRpcServer {
         return new PeerId(getRealIP(), port());
     }
 
-    public static void main(String[] args) throws SocketException {
-        System.out.println(getRealIP());
-    }
-
     public static String getRealIP() throws SocketException {
         Enumeration<NetworkInterface> interfaces = NetworkInterface.getNetworkInterfaces();
         while (interfaces.hasMoreElements()) {

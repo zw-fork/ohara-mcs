@@ -3,10 +3,12 @@ package org.ohara.mcs.core.remote.raft.processor;
 import com.alipay.sofa.jraft.Closure;
 import com.alipay.sofa.jraft.Node;
 import com.alipay.sofa.jraft.Status;
+import com.alipay.sofa.jraft.closure.ReadIndexClosure;
 import com.alipay.sofa.jraft.entity.PeerId;
 import com.alipay.sofa.jraft.entity.Task;
 import com.alipay.sofa.jraft.rpc.RpcContext;
 import com.alipay.sofa.jraft.rpc.RpcProcessor;
+import com.alipay.sofa.jraft.util.BytesUtil;
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
 import org.apache.commons.lang3.SerializationException;
@@ -18,10 +20,13 @@ import org.ohara.mcs.core.remote.raft.handler.RequestDispatcher;
 import org.ohara.mcs.api.result.ResponseHelper;
 import org.ohara.mcs.core.serializer.Serializer;
 import org.ohara.msc.common.enums.ResponseCode;
+import org.ohara.msc.common.exception.OHaraMcsException;
 import org.ohara.msc.common.log.Log;
 
 import java.nio.ByteBuffer;
 import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static org.ohara.msc.common.enums.ResponseCode.SYSTEM_ERROR;
 
@@ -64,16 +69,28 @@ public abstract class AbstractRpcProcessor<T extends Message> implements RpcProc
                 return;
             }
 
-            // 3. 写操作必须由Leader处理
-            if (isWriteMode && !server.isLeader(group)) {
-                redirect(ctx, leaderId);
-                return;
-            } else if (!isWriteMode && !server.isLeader(group)) {
-                handleReadRequest(ctx, request);
-                return;
+            // 3.读操作尝试线性一致读
+            if (!isWriteMode && !server.isLeader(group)) {
+                //handleReadRequest(node, ctx, request);
+                Response response = handleReadRequest(node, request);
+                if (response != null) {
+                    ctx.sendResponse(response);
+                    return;
+                }
+                // 否则继续执行下面的逻辑
             }
 
-            // 4. 序列化请求
+            // 4. 写操作必须由Leader处理
+            if (!server.isLeader(group)) {
+                redirect(ctx, leaderId);
+                return;
+            }
+//            if (isWriteMode && !server.isLeader(group)) {
+//                redirect(ctx, leaderId);
+//                return;
+//            }
+
+            // 5. 序列化请求
             byte[] serialized;
             try {
                 serialized = serializer.serialize(request);
@@ -113,7 +130,8 @@ public abstract class AbstractRpcProcessor<T extends Message> implements RpcProc
         }
     }
 
-    private void handleReadRequest(RpcContext ctx, T request) {
+    @Deprecated
+    private void handleReadRequest(Node node, RpcContext ctx, T request) {
         try {
             // 1. 查询本地状态机
             Log.print("查询模式，由本地状态机器执行，不向leader发起请求, request=%s", request);
@@ -123,6 +141,45 @@ public abstract class AbstractRpcProcessor<T extends Message> implements RpcProc
             systemError(ctx, e);
         }
     }
+
+    private Response handleReadRequest(Node node, T request) {
+        CompletableFuture<Response> future = readIndex(node, request);
+        try {
+            return future.get();
+        } catch (Exception e) {
+            Log.error("handleReadRequest failed, errorMsg={}", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    /**
+     * 线性一致读
+     *
+     * @param node
+     * @param request
+     * @return
+     */
+    private CompletableFuture<Response> readIndex(Node node, T request) {
+        CompletableFuture<Response> future = new CompletableFuture<>();
+        node.readIndex(BytesUtil.EMPTY_BYTES, new ReadIndexClosure() {
+            @Override
+            public void run(Status status, long index, byte[] reqCtx) {
+                if (status.isOk()) {
+                    try {
+                        Log.print("查询模式，由本地状态机器执行，不向leader发起请求, request=%s", request);
+                        Response response = dispatcher.dispatch(request, request.getClass());
+                        future.complete(response);
+                    } catch (Throwable t) {
+                        future.completeExceptionally(new OHaraMcsException("The conformance protocol is temporarily unavailable for reading", t));
+                    }
+                    return;
+                }
+                Log.error("ReadIndex has error : {}, go to Leader read.", status.getErrorMsg());
+            }
+        });
+        return future;
+    }
+
 
     public interface FailoverClosure extends Closure {
         void setResponse(Response response);
