@@ -46,7 +46,7 @@ public class OHaraMcsServerInitializer implements ApplicationListener<ContextRef
 
             startRaftNode();
 
-            // 如果在 SpringBoot Web 容器环境运行，可以不需要让主线程阻塞等待着
+            // 如果在 SpringBoot Web 容器环境运行，可以不需要让主线程阻塞
             if (!(ctx instanceof WebApplicationContext)) {
                 rpcServer.await();
             }

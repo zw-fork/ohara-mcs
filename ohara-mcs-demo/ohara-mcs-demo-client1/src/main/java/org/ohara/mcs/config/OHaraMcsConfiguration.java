@@ -21,4 +21,8 @@ public class OHaraMcsConfiguration {
         OHaraMcsClient mcsClient = OHaraMcsClient.builder(config.getNamespace(), option).build();
         return new OHaraMcsService(mcsClient);
     }
+
+    public static void main(String[] args) {
+
+    }
 }

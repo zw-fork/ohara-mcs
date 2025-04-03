@@ -17,6 +17,7 @@ import org.ohara.mcs.api.grpc.auto.Metadata;
 import org.ohara.mcs.api.grpc.auto.Response;
 import org.ohara.mcs.core.remote.raft.handler.RequestDispatcher;
 import org.ohara.mcs.api.result.ResponseHelper;
+import org.ohara.mcs.core.serializer.SerializeFactory;
 import org.ohara.mcs.core.serializer.Serializer;
 import org.ohara.mcs.core.storage.MetadaStorage;
 import org.ohara.mcs.core.utils.ProtoMessageUtils;
@@ -24,9 +25,7 @@ import org.ohara.mcs.core.utils.StorageHolder;
 import org.ohara.msc.common.enums.ResponseCode;
 import org.ohara.msc.common.log.Log;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.*;
 import java.nio.ByteBuffer;
 import java.util.Map;
 import java.util.Optional;
@@ -222,6 +221,24 @@ public class RaftStateMachine extends StateMachineAdapter {
             return false;
         }
     }
+
+//    public static void main(String[] args) {
+//        String snapshotFilePath = "/Users/caoshipeng/IdeaProjects/ohara-mcs/raft/config_center_group/127.0.0.1_9001/snapshot/snapshot_13/metadata_config.data";
+//        File snapshotFile = new File(snapshotFilePath);
+//        try (FileInputStream fis = new FileInputStream(snapshotFile)) {
+//            // 1. 读取快照数据
+//            byte[] data = new byte[(int) snapshotFile.length()];
+//            fis.read(data);
+//
+//            // 2. 反序列化并恢复存储
+//            MetadaStorage storage = StorageHolder.getInstance("metadata");
+//            Map<String, Metadata> snapshot = SerializeFactory.getDefault().deserialize(data);
+//
+//
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
 
     /**
      * 保存快照, TODO 后续可以考虑持久化到磁盘后，同时向DB/Redis持久化
