@@ -42,8 +42,10 @@ public class OHaraMcsServerInitializer implements ApplicationListener<ContextRef
         if (event.getApplicationContext().getParent() == null) {
             ApplicationContext ctx = event.getApplicationContext();
             RpcServer rpcServer = ctx.getBean(RpcServer.class);
+            // 启动RPC服务
             rpcServer.start();
 
+            // 启动并注册Raft服务
             startRaftNode();
 
             // 如果在 SpringBoot Web 容器环境运行，可以不需要让主线程阻塞

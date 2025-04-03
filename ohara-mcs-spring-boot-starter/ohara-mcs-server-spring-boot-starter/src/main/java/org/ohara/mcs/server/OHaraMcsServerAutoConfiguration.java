@@ -38,6 +38,11 @@ public class OHaraMcsServerAutoConfiguration {
         return new OHaraMcsServerInitializer(rpcServer, config, bannerUtils);
     }
 
+    /**
+     * Banner Logo打印，支持自定义，和SpringBoot Banner用法一样
+     * @param resourceLoader
+     * @return
+     */
     @Bean
     public BannerUtils bannerUtils(ResourceLoader resourceLoader) {
         return new BannerUtils(resourceLoader);
